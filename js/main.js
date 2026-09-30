@@ -151,47 +151,6 @@ function initSocialSwitcher() {
   const panels = document.querySelectorAll('.social-panel');
   if (!buttons.length || !panels.length) return;
 
-  let tiktokLoaded = false;
-  let tiktokFailed = false;
-
-  function loadTikTokEmbed() {
-    if (tiktokLoaded || tiktokFailed) return;
-    tiktokLoaded = true;
-
-    const script = document.createElement('script');
-    script.src = 'https://www.tiktok.com/embed.js';
-    script.async = true;
-    script.onerror = () => {
-      tiktokFailed = true;
-      showTikTokFallback();
-    };
-    document.body.appendChild(script);
-
-    // Fallback timeout — if embed doesn't render within 8s, show fallback
-    setTimeout(() => {
-      if (tiktokFailed) return;
-      const container = document.getElementById('tiktok-container');
-      if (!container) return;
-      const iframe = container.querySelector('iframe');
-      const blockquote = container.querySelector('.tiktok-embed');
-      // If no iframe appeared and blockquote is still plain text, embed likely failed
-      if (!iframe && blockquote && blockquote.querySelector('section a')) {
-        // Check if overload-protect text appeared
-        if (blockquote.textContent.includes('overload') || blockquote.textContent.includes('protect')) {
-          tiktokFailed = true;
-          showTikTokFallback();
-        }
-      }
-    }, 8000);
-  }
-
-  function showTikTokFallback() {
-    const container = document.getElementById('tiktok-container');
-    const fallback = document.getElementById('tiktok-fallback');
-    if (container) container.style.display = 'none';
-    if (fallback) fallback.style.display = 'block';
-  }
-
   buttons.forEach(btn => {
     btn.addEventListener('click', () => {
       const platform = btn.getAttribute('data-platform');
@@ -213,14 +172,6 @@ function initSocialSwitcher() {
           p.setAttribute('hidden', '');
         }
       });
-
-      // Lazy-load TikTok embed when tab is activated
-      if (platform === 'tiktok') {
-        loadTikTokEmbed();
-      }
     });
   });
-
-  // Load TikTok on initial page load since it's the default active tab
-  loadTikTokEmbed();
 }
